@@ -1,4 +1,5 @@
-import { timeParse } from 'd3';
+import { timeFormat, timeParse } from 'd3';
+import { Train } from './types';
 
 export const timeFormatStr = '%I:%M%p';
 
@@ -12,4 +13,20 @@ export const parseTime = (timeStr: string): Date => {
 	}
 
 	return timeDate!;
+};
+
+export const convertDateToString = (date: Date): string => {
+	return timeFormat(timeFormatStr)(date);
+};
+
+export const getTrainTitle = (trainData: Train): string => {
+	const {
+		stops: { 0: firstStop, [trainData.stops.length - 1]: lastStop },
+	} = trainData;
+
+	if (trainData.direction === 'S') {
+		return `${firstStop.station.name} -> ${lastStop.station.name}`;
+	}
+
+	return `${lastStop.station.name} -> ${firstStop.station.name}`;
 };

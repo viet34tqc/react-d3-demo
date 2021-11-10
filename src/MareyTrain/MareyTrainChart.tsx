@@ -6,13 +6,13 @@ import {
 	scaleLinear,
 	scaleUtc,
 	select,
+	selectAll,
 	Selection,
-	timeFormat,
 	utcHour,
 } from 'd3';
 import React, { useEffect, useRef, useState } from 'react';
 import { Station, Stop, Train } from './types';
-import { parseTime, timeFormatStr } from './utils';
+import { convertDateToString, getTrainTitle, parseTime } from './utils';
 
 interface MareyTrainChartProps {
 	stations: Station[];
@@ -62,11 +62,11 @@ const MareyTrainChart = ({ trains, stations }: MareyTrainChartProps) => {
 
 			const xAxisBottom = axisBottom<Date>(xScale)
 				.ticks(utcHour)
-				.tickFormat(date => timeFormat(timeFormatStr)(date as Date));
+				.tickFormat(date => convertDateToString(date));
 
 			const xAxisTop = axisTop<Date>(xScale)
 				.ticks(utcHour)
-				.tickFormat(date => timeFormat(timeFormatStr)(date as Date));
+				.tickFormat(date => convertDateToString(date));
 
 			const yAxis = (g: any) =>
 				g
@@ -111,21 +111,14 @@ const MareyTrainChart = ({ trains, stations }: MareyTrainChartProps) => {
 
 			wrapper.append('g').call(yAxis);
 
-			// Here is the line chart
-			// Put it at the bottom so that it can't be hidden other lines
-
+			// Here is the line charts
+			// Put it at the bottom so that it can be on top of other lines.
 			const trainsChart = wrapper
 				.append('g')
 				.attr('stroke-width', 1.5)
 				.selectAll('g')
 				.data(trains)
-				.join('g')
-				.on('mouseover', function () {
-					select(this).select('path').style('stroke-width', '5px');
-				})
-				.on('mouseleave', function () {
-					select(this).select('path').style('stroke-width', '1.5px');
-				});
+				.join('g');
 
 			// d here has the type Stop
 			const lines = line()
@@ -138,7 +131,23 @@ const MareyTrainChart = ({ trains, stations }: MareyTrainChartProps) => {
 				.append('path')
 				.attr('fill', 'none')
 				.attr('stroke', (d: Train) => colors[d.type])
-				.attr('d', (d: any) => lines(d.stops));
+				.attr('stroke-dasharray', '3')
+				.attr('d', (d: any) => lines(d.stops))
+				.on('mouseover', function (event: MouseEvent, train: Train) {
+					const title = getTrainTitle(train);
+
+					select('body')
+						.append('div')
+						.style('position', 'absolute')
+						.attr('class', 'tooltip')
+						.style('visibility', 'visible')
+						.html(title)
+						.style('top', `${event.clientY}px`)
+						.style('left', `${event.clientX}px`);
+				})
+				.on('mouseleave', function () {
+					selectAll('.tooltip').remove();
+				});
 
 			trainsChart
 				.append('g')
@@ -154,7 +163,25 @@ const MareyTrainChart = ({ trains, stations }: MareyTrainChartProps) => {
 							d.station.distance
 						)})`
 				)
-				.attr('r', 3);
+				.attr('r', 3)
+				.on('mouseover', function (event: MouseEvent, stop: Stop) {
+					select('body')
+						.append('div')
+						.style('position', 'absolute')
+						.attr('class', 'tooltip')
+						.style('visibility', 'visible')
+						.html(
+							`
+								<div>Current station: ${stop.station.name}</div>
+								<div>Time: ${convertDateToString(stop.time as Date)}</div>
+							`
+						)
+						.style('top', `${event.clientY}px`)
+						.style('left', `${event.clientX}px`);
+				})
+				.on('mouseout', function () {
+					selectAll('.tooltip').remove();
+				});
 		}
 	}, [stations, trains, selection]);
 
