@@ -25,13 +25,13 @@ const margin = { top: 20, right: 30, bottom: 20, left: 100 },
 	height = 500,
 	innerHeight = 500 - margin.top - margin.bottom;
 
-const colors = {
-	N: 'rgb(34, 34, 34)',
-	L: 'rgb(183, 116, 9)',
-	B: 'rgb(192, 62, 29)',
-	W: 'currentColor',
-	S: 'currentColor',
-};
+enum colors {
+	N = 'rgb(34, 34, 34)',
+	L = 'rgb(183, 116, 9)',
+	B = 'rgb(192, 62, 29)',
+	W = 'currentColor',
+	S = 'currentColor',
+}
 
 const MareyTrainChart = ({ trains, stations }: MareyTrainChartProps) => {
 	const svgRef = useRef(null);
