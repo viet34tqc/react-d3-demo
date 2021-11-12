@@ -1,13 +1,14 @@
 import { tsv } from 'd3';
 import { useEffect, useState } from 'react';
+import TimeRangeSlider from './components/Slider';
 import MareyTrainChart from './MareyTrainChart';
 import { RawDataItem, Station, Train } from './types';
-import { parseTime } from './utils';
+import { convertMinutesToTimes, parseTime } from './utils';
 
 const MareyTrain = () => {
 	const [stations, setStations] = useState<Station[]>([]);
+	const [minutes, setMinutes] = useState([0, 300]);
 	const [trains, setTrains] = useState<Train[]>([]);
-
 	const fetchData = async () => {
 		const originalItems = (await tsv(
 			'data/data.tsv'
@@ -58,11 +59,18 @@ const MareyTrain = () => {
 		fetchData();
 	}, []);
 
+	const handleChangeMinutes = (event: any, newValue: any) => {
+		setMinutes(newValue);
+	};
+
 	if (stations.length === 0) return <div>Loading...</div>;
+
+	const times = minutes.map(convertMinutesToTimes);
 
 	return (
 		<>
-			<MareyTrainChart stations={stations} trains={trains} />
+			<TimeRangeSlider minutes={minutes} onChange={handleChangeMinutes} />
+			<MareyTrainChart stations={stations} trains={trains} times={times} />
 		</>
 	);
 };
