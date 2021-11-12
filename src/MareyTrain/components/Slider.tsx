@@ -14,6 +14,7 @@ const TimeRangeSlider = ({ minutes, onChange }: SliderProps) => {
 		<Box mt="30px">
 			<Slider
 				value={minutes}
+				min={270}
 				max={1440}
 				onChange={onChange}
 				valueLabelDisplay="auto"

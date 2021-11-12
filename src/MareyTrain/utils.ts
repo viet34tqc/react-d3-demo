@@ -4,7 +4,6 @@ import { Train } from './types';
 export const timeFormatStr = '%I:%M%p';
 
 const getParseTime = () => timeParse(timeFormatStr);
-
 export const parseTime = (timeStr: string): Date => {
 	const timeDate = getParseTime()(timeStr);
 
@@ -32,7 +31,7 @@ export const convertMinutesToTimes = (limit: number): string => {
 
 	const minutesStr = rminutes < 10 ? `0${rminutes}` : rminutes.toString();
 
-	return `${rhours}:${minutesStr}${fragment}`; 
+	return `${rhours}:${minutesStr}${fragment}`;
 };
 
 export const getTrainTitle = (trainData: Train): string => {

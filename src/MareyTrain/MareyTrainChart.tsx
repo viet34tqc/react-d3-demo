@@ -4,10 +4,9 @@ import {
 	extent,
 	line,
 	scaleLinear,
-	scaleUtc,
+	scaleTime,
 	select,
 	selectAll,
-	utcHour
 } from 'd3';
 import React, { useEffect, useRef } from 'react';
 import { Station, Stop, Train } from './types';
@@ -38,12 +37,13 @@ const MareyTrainChart = ({ trains, stations, times }: MareyTrainChartProps) => {
 
 	useEffect(() => {
 		const svg = select(svgRef.current);
-		svg.selectAll('*').remove();
+		svg.selectAll('*').remove(); // Clear the svg before redraw
+
 		const wrapper = svg
 			.append('g')
 			.attr('transform', `translate(${margin.left},${margin.top})`);
 
-		const xScale = scaleUtc()
+		const xScale = scaleTime()
 			.domain([parseTime(times[0]), parseTime(times[1])])
 			.range([0, innerWidth]);
 
@@ -52,11 +52,11 @@ const MareyTrainChart = ({ trains, stations, times }: MareyTrainChartProps) => {
 			.range([0, innerHeight]);
 
 		const xAxisBottom = axisBottom<Date>(xScale)
-			.ticks(utcHour)
+			.ticks(8)
 			.tickFormat(date => convertDateToString(date));
 
 		const xAxisTop = axisTop<Date>(xScale)
-			.ticks(utcHour)
+			.ticks(8)
 			.tickFormat(date => convertDateToString(date));
 
 		const yAxis = (g: any) =>
