@@ -1,16 +1,54 @@
 import {
 	axisBottom,
 	axisTop,
+	BaseType,
 	extent,
 	line,
 	scaleLinear,
 	scaleTime,
 	select,
 	selectAll,
+	Selection,
 } from 'd3';
 import React, { useEffect, useRef } from 'react';
 import { Station, Stop, Train } from './types';
 import { convertDateToString, getTrainTitle, parseTime } from './utils';
+
+function getTranslation(transform: string) {
+	// Create a dummy g for calculation purposes only. This will never
+	// be appended to the DOM and will be discarded once this function
+	// returns.
+	var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+	// Set the transform attribute to the provided string value.
+	g.setAttributeNS(null, 'transform', transform);
+
+	// consolidate the SVGTransformList containing all transformations
+	// to a single SVGTransform of type SVG_TRANSFORM_MATRIX and get
+	// its SVGMatrix.
+	var matrix = g.transform.baseVal?.consolidate()?.matrix as DOMMatrix;
+
+	// As per definition values e and f are the ones for the translation.
+	return [matrix.e, matrix.f];
+}
+
+function getCollisions(
+	circles: Selection<BaseType | SVGCircleElement, Stop, SVGGElement, Train>
+) {
+	const transforms: any = {};
+	const collision: any[] = [];
+
+	circles.each(function (d, i) {
+		const transform = select(this).attr('transform');
+		const [x, y] = getTranslation(transform);
+		if (transforms.hasOwnProperty(transform)) {
+			collision.push([x, y]);
+		}
+		transforms[transform] = [x, y];
+	});
+
+	return collision;
+}
 
 interface MareyTrainChartProps {
 	stations: Station[];
@@ -153,7 +191,7 @@ const MareyTrainChart = ({ trains, stations, times }: MareyTrainChartProps) => {
 			.attr('startOffset', '50%')
 			.text((d: Train) => getTrainTitle(d));
 
-		trainsChart
+		const circles = trainsChart
 			.append('g')
 			.attr('stroke', 'white')
 			.attr('fill', (d: Train) => colors[d.type])
@@ -184,6 +222,20 @@ const MareyTrainChart = ({ trains, stations, times }: MareyTrainChartProps) => {
 			.on('mouseout', function () {
 				selectAll('.tooltip').remove();
 			});
+
+		// Conflict points
+		const collisions = getCollisions(circles);
+		collisions.forEach(collision => {
+			trainsChart
+				.append('rect')
+				.attr('x', collision[0] - 3)
+				.attr('y', collision[1] - 3)
+				.style('width', '10px')
+				.style('height', '10px')
+				.attr('fill', 'white')
+				.style('stroke-width', '1px')
+				.style('stroke', '#333');
+		});
 	}, [stations, trains, times]);
 
 	return (
