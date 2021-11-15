@@ -7,7 +7,7 @@ import { convertMinutesToTimes, parseTime } from './utils';
 
 const MareyTrain = () => {
 	const [stations, setStations] = useState<Station[]>([]);
-	const [minutes, setMinutes] = useState([0, 300]);
+	const [minutes, setMinutes] = useState([270, 720]);
 	const [trains, setTrains] = useState<Train[]>([]);
 	const fetchData = async () => {
 		const originalItems = (await tsv(

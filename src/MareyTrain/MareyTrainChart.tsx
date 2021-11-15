@@ -33,6 +33,7 @@ enum colors {
 }
 
 const MareyTrainChart = ({ trains, stations, times }: MareyTrainChartProps) => {
+	console.log('times', times);
 	const svgRef = useRef(null);
 
 	useEffect(() => {
@@ -120,6 +121,7 @@ const MareyTrainChart = ({ trains, stations, times }: MareyTrainChartProps) => {
 		// The data input is that train's stop list
 		trainsChart
 			.append('path')
+			.attr('id', (d: Train) => `train_${d.id}`)
 			.attr('fill', 'none')
 			.attr('stroke', (d: Train) => colors[d.type])
 			.attr('stroke-dasharray', '3')
@@ -139,6 +141,17 @@ const MareyTrainChart = ({ trains, stations, times }: MareyTrainChartProps) => {
 			.on('mouseleave', function () {
 				selectAll('.tooltip').remove();
 			});
+
+		// Train name
+		trainsChart
+			.append('text')
+			.attr('dy', '-2')
+			.append('textPath')
+			.attr('xlink:href', (d: Train) => `#train_${d.id}`)
+			.style('text-anchor', 'middle')
+			.style('font-size', '10px')
+			.attr('startOffset', '50%')
+			.text((d: Train) => getTrainTitle(d));
 
 		trainsChart
 			.append('g')
