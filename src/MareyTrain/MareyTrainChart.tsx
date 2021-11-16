@@ -65,9 +65,17 @@ const margin = { top: 20, right: 30, bottom: 20, left: 100 },
 enum colors {
 	N = 'rgb(34, 34, 34)',
 	L = 'rgb(183, 116, 9)',
-	B = 'rgb(192, 62, 29)',
-	W = 'currentColor',
+	B = 'rgb(42, 102, 212)',
+	W = 'rgb(97, 143, 67)',
 	S = 'currentColor',
+}
+
+enum strokes {
+	N = '0',
+	L = '5,5',
+	B = '10,10',
+	W = '10,10,5,5,5,10',
+	S = '0',
 }
 
 const MareyTrainChart = ({ trains, stations, times }: MareyTrainChartProps) => {
@@ -162,7 +170,7 @@ const MareyTrainChart = ({ trains, stations, times }: MareyTrainChartProps) => {
 			.attr('id', (d: Train) => `train_${d.id}`)
 			.attr('fill', 'none')
 			.attr('stroke', (d: Train) => colors[d.type])
-			.attr('stroke-dasharray', '3')
+			.attr('stroke-dasharray', (d: Train) => strokes[d.type])
 			.attr('d', (d: any) => lines(d.stops))
 			.on('mouseover', function (event: MouseEvent, train: Train) {
 				const title = getTrainTitle(train);
