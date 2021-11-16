@@ -115,11 +115,22 @@ const MareyTrainChart = ({ trains, stations, times }: MareyTrainChartProps) => {
 
 		wrapper.append('g').call(yAxis);
 
+		// Clip path
+		wrapper
+			.append('defs')
+			.append('clipPath')
+			.attr('id', 'clipPath')
+			.append('rect')
+			.attr('y', -margin.top)
+			.attr('width', innerWidth)
+			.attr('height', height);
+
 		// Here is the line charts
 		// Put it at the bottom so that it can be on top of other lines.
 		const trainsChart = wrapper
 			.append('g')
 			.attr('stroke-width', 1.5)
+			.attr('clip-path', "url(#clipPath)")
 			.selectAll('g')
 			.data(trains)
 			.join('g');
