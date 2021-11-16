@@ -42,7 +42,7 @@ function getCollisions(
 		const transform = select(this).attr('transform');
 		const [x, y] = getTranslation(transform);
 		if (transforms.hasOwnProperty(transform)) {
-			collision.push([x, y]);
+			collision.push({ location: [x, y], data: d });
 		}
 		transforms[transform] = [x, y];
 	});
@@ -79,7 +79,6 @@ enum strokes {
 }
 
 const MareyTrainChart = ({ trains, stations, times }: MareyTrainChartProps) => {
-	console.log('times', times);
 	const svgRef = useRef(null);
 
 	useEffect(() => {
@@ -233,16 +232,34 @@ const MareyTrainChart = ({ trains, stations, times }: MareyTrainChartProps) => {
 
 		// Conflict points
 		const collisions = getCollisions(circles);
-		collisions.forEach(collision => {
+		collisions.forEach(({location, data}) => {
+			console.log('data', data);
 			trainsChart
 				.append('rect')
-				.attr('x', collision[0] - 3)
-				.attr('y', collision[1] - 3)
+				.attr('x', location[0] - 3)
+				.attr('y', location[1] - 3)
+				.style('fill', 'white')
 				.style('width', '10px')
 				.style('height', '10px')
-				.attr('fill', 'white')
 				.style('stroke-width', '1px')
-				.style('stroke', '#333');
+				.style('stroke', '#333')
+				.on('mouseover', function (event: MouseEvent) {
+					select('body')
+						.append('div')
+						.style('position', 'absolute')
+						.attr('class', 'tooltip')
+						.style('visibility', 'visible')
+						.html(
+							`
+								<div>Conflict point: ${data.station.name}</div>
+							`
+						)
+						.style('top', `${event.clientY}px`)
+						.style('left', `${event.clientX}px`);
+				})
+				.on('mouseout', function () {
+					selectAll('.tooltip').remove();
+				});
 		});
 	}, [stations, trains, times]);
 

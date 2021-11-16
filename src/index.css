@@ -5,10 +5,13 @@
 body {
 	margin: 0;
 	font-family: 'Poppins', sans-serif;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	min-height: 100vh;
 }
-pre {
-	font-size: 7em;
-}
+
 .tick line {
 	stroke: #c0c0bb;
 }
