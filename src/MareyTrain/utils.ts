@@ -1,5 +1,5 @@
-import { timeFormat, timeParse } from 'd3';
-import { Train } from './types';
+import { BaseType, select, Selection, timeFormat, timeParse } from 'd3';
+import { Stop, Train } from './types';
 
 export const timeFormatStr = '%I:%M%p';
 
@@ -45,3 +45,39 @@ export const getTrainTitle = (trainData: Train): string => {
 
 	return `${lastStop.station.name} -> ${firstStop.station.name}`;
 };
+
+export function getTransform(transform: string) {
+	// Create a dummy g for calculation purposes only. This will never
+	// be appended to the DOM and will be discarded once this function
+	// returns.
+	var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+	// Set the transform attribute to the provided string value.
+	g.setAttributeNS(null, 'transform', transform);
+
+	// consolidate the SVGTransformList containing all transformations
+	// to a single SVGTransform of type SVG_TRANSFORM_MATRIX and get
+	// its SVGMatrix.
+	var matrix = g.transform.baseVal?.consolidate()?.matrix as DOMMatrix;
+
+	// As per definition values e and f are the ones for the translation.
+	return [matrix.e, matrix.f];
+}
+
+export function getCollisions(
+	circles: Selection<BaseType | SVGCircleElement, Stop, SVGGElement, Train>
+) {
+	const transforms: any = {};
+	const collision: any[] = [];
+
+	circles.each(function (d, i) {
+		const transform = select(this).attr('transform');
+		const [x, y] = getTransform(transform);
+		if (transforms.hasOwnProperty(transform)) {
+			collision.push({ location: [x, y], data: d });
+		}
+		transforms[transform] = [x, y];
+	});
+
+	return collision;
+}
