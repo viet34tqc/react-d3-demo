@@ -51,8 +51,6 @@ const MareyTrain = () => {
 				};
 			})
 			.filter(train => /[NLB]/.test(train.type));
-
-			console.log('trains', trains);
 		setTrains(trains);
 	};
 

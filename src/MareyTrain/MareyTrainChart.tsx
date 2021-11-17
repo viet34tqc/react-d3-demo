@@ -8,7 +8,7 @@ import {
 	select,
 	selectAll,
 } from 'd3';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { Station, Stop, Train } from './types';
 import {
 	convertDateToString,
@@ -45,43 +45,35 @@ enum strokes {
 	S = '0',
 }
 
-const MareyTrainChart = ({ trains, stations, times }: MareyTrainChartProps) => {
-	const svgRef = useRef(null);
-
+const XAxis = ({ type, scale, transform }: any) => {
+	const ref = useRef<SVGGElement>(null as unknown as SVGGElement);
 	useEffect(() => {
-		const svg = select(svgRef.current);
-		svg.selectAll('*').remove(); // Clear the svg before redraw
-
-		const wrapper = svg
-			.append('g')
-			.attr('transform', `translate(${margin.left},${margin.top})`);
-
-		const xScale = scaleTime()
-			.domain([parseTime(times[0]), parseTime(times[1])])
-			.range([0, innerWidth]);
-
-		const yScale = scaleLinear()
-			.domain(extent(stations, (d: Station) => d.distance) as [number, number])
-			.range([0, innerHeight]);
-
-		const xAxisBottom = axisBottom<Date>(xScale)
+		const axisGenerator = type === 'top' ? axisTop : axisBottom;
+		const axis = axisGenerator<Date>(scale)
 			.ticks(8)
 			.tickFormat(date => convertDateToString(date));
+		const axisGroup = select(ref.current);
+		axisGroup.call(axis).select('.domain').remove();
+	}, [type, scale]);
 
-		const xAxisTop = axisTop<Date>(xScale)
-			.ticks(8)
-			.tickFormat(date => convertDateToString(date));
+	return <g ref={ref} transform={transform}></g>;
+};
 
+interface YAxisProps {
+	scale: any;
+	stations: Station[];
+}
+const YAxis = ({ scale, stations }: YAxisProps) => {
+	const ref = useRef<SVGGElement>(null as unknown as SVGGElement);
+	useEffect(() => {
+		const axisGroup = select(ref.current);
 		const yAxis = (g: any) =>
 			g
 				.style('font', '10px sans-serif')
 				.selectAll('g')
 				.data(stations)
 				.join('g')
-				.attr(
-					'transform',
-					(d: Station) => `translate(0, ${yScale(d.distance)})`
-				)
+				.attr('transform', (d: Station) => `translate(0, ${scale(d.distance)})`)
 				.call((g: any) =>
 					g
 						.append('line')
@@ -98,39 +90,28 @@ const MareyTrainChart = ({ trains, stations, times }: MareyTrainChartProps) => {
 						.attr('text-anchor', 'end')
 						.text((d: Station) => d.name)
 				);
+		axisGroup.call(yAxis);
+	}, [scale, stations]);
+	return <g ref={ref} />;
+};
 
-		wrapper
-			.append('g')
-			.call(xAxisTop)
-			.select('.domain')
-			.remove()
-			.selectAll('.tick line');
+interface LineChartProps {
+	xScale: any;
+	yScale: any;
+	trains: Train[];
+}
 
-		wrapper
-			.append('g')
-			.call(xAxisBottom)
-			.attr('transform', `translate(0,${innerHeight})`)
-			.select('.domain')
-			.remove();
-
-		wrapper.append('g').call(yAxis);
-
-		// Clip path
-		wrapper
-			.append('defs')
-			.append('clipPath')
-			.attr('id', 'clipPath')
-			.append('rect')
-			.attr('y', -margin.top)
-			.attr('width', innerWidth)
-			.attr('height', height);
+const LineChart = ({ xScale, yScale, trains }: LineChartProps) => {
+	const ref = useRef<SVGGElement>(null as unknown as SVGGElement);
+	useEffect(() => {
+		const lineGroup = select(ref.current);
+		lineGroup.selectAll('*').remove();
 
 		// Here is the line charts
 		// Put it at the bottom so that it can be on top of other lines.
-		const trainsChart = wrapper
-			.append('g')
+		const trainsChart = lineGroup
 			.attr('stroke-width', 1.5)
-			.attr('clip-path', "url(#clipPath)")
+			.attr('clip-path', 'url(#clipPath)')
 			.selectAll('g')
 			.data(trains)
 			.join('g');
@@ -211,7 +192,6 @@ const MareyTrainChart = ({ trains, stations, times }: MareyTrainChartProps) => {
 		// Conflict points
 		const collisions = getCollisions(circles);
 		collisions.forEach(({ location, data }) => {
-			console.log('data', data);
 			trainsChart
 				.append('rect')
 				.attr('x', location[0] - 3)
@@ -239,12 +219,61 @@ const MareyTrainChart = ({ trains, stations, times }: MareyTrainChartProps) => {
 					selectAll('.tooltip').remove();
 				});
 		});
-	}, [stations, trains, times]);
+	}, [trains, xScale, yScale]);
+	return <g ref={ref} />;
+};
+
+const Def = () => {
+	const ref = useRef<SVGGElement>(null as unknown as SVGGElement);
+	useEffect(() => {
+		const def = select(ref.current);
+		def
+			.append('clipPath')
+			.attr('id', 'clipPath')
+			.append('rect')
+			.attr('y', -margin.top)
+			.attr('width', innerWidth)
+			.attr('height', height);
+	}, []);
+
+	return <defs ref={ref} />;
+};
+
+const MareyTrainChart = ({ trains, stations, times }: MareyTrainChartProps) => {
+	const svgRef = useRef(null);
+
+	const xScale = useMemo(
+		() =>
+			scaleTime()
+				.domain([parseTime(times[0]), parseTime(times[1])])
+				.range([0, innerWidth]),
+		[times]
+	);
+
+	const yScale = useMemo(
+		() =>
+			scaleLinear()
+				.domain(
+					extent(stations, (d: Station) => d.distance) as [number, number]
+				)
+				.range([0, innerHeight]),
+		[stations]
+	);
 
 	return (
-		<div>
-			<svg ref={svgRef} width={width} height={height}></svg>
-		</div>
+		<svg ref={svgRef} width={width} height={height}>
+			<g transform={`translate(${margin.left},${margin.top})`}>
+				<XAxis type="top" scale={xScale} />
+				<XAxis
+					type="bottom"
+					scale={xScale}
+					transform={`translate(0,${innerHeight})`}
+				/>
+				<YAxis scale={yScale} stations={stations} />
+				<Def />
+				<LineChart xScale={xScale} yScale={yScale} trains={trains} />
+			</g>
+		</svg>
 	);
 };
 
