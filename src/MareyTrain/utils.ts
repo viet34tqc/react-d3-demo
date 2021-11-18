@@ -3,6 +3,29 @@ import { Stop, Train } from './types';
 
 export const timeFormatStr = '%I:%M%p';
 
+const margin = { top: 20, right: 30, bottom: 20, left: 100 },
+	width = 1400,
+	innerWidth = width - margin.left - margin.right,
+	height = 500,
+	innerHeight = 500 - margin.top - margin.bottom;
+export { margin, width, innerWidth, innerHeight, height };
+
+export enum colors {
+	N = 'rgb(34, 34, 34)',
+	L = 'rgb(183, 116, 9)',
+	B = 'rgb(42, 102, 212)',
+	W = 'rgb(97, 143, 67)',
+	S = 'currentColor',
+}
+
+export enum strokes {
+	N = '0',
+	L = '5,5',
+	B = '10,10',
+	W = '10,10,5,5,5,10',
+	S = '0',
+}
+
 const getParseTime = () => timeParse(timeFormatStr);
 export const parseTime = (timeStr: string): Date => {
 	const timeDate = getParseTime()(timeStr);
