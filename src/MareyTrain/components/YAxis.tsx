@@ -1,5 +1,5 @@
 import { select } from 'd3';
-import { useEffect, useRef } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { Station } from '../types';
 import { innerWidth } from '../utils';
 
@@ -41,4 +41,4 @@ const YAxis = ({ scale, stations }: YAxisProps) => {
 	return <g ref={ref} />;
 };
 
-export default YAxis;
+export default memo(YAxis);

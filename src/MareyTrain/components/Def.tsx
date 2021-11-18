@@ -1,9 +1,9 @@
 import { select } from 'd3';
-import { useEffect, useRef } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { height, innerWidth, margin } from '../utils';
 
 const Def = () => {
-	const ref = useRef<SVGGElement>(null as unknown as SVGGElement);
+	const ref = useRef<SVGDefsElement>(null as unknown as SVGDefsElement);
 	useEffect(() => {
 		const def = select(ref.current);
 		def
@@ -18,4 +18,4 @@ const Def = () => {
 	return <defs ref={ref} />;
 };
 
-export default Def;
+export default memo(Def);

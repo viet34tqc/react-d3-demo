@@ -1,7 +1,7 @@
 import { extent, scaleLinear, scaleTime } from 'd3';
 import { useMemo, useRef } from 'react';
 import Def from './components/Def';
-import Trains from './components/LineChart';
+import Trains from './components/Trains';
 import XAxis from './components/XAxis';
 import YAxis from './components/YAxis';
 import { Station, Train } from './types';
