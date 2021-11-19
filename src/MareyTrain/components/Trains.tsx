@@ -107,7 +107,7 @@ const Trains = ({ xScale, yScale, trains }: TrainsProps) => {
 		// Conflict points
 		const collisions = getCollisions(circles);
 		collisions.forEach(({ location, data }) => {
-			trainsChart
+			lineGroup
 				.append('rect')
 				.attr('x', location[0] - 3)
 				.attr('y', location[1] - 3)

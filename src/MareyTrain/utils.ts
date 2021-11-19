@@ -87,6 +87,11 @@ export function getTransform(transform: string) {
 	return [matrix.e, matrix.f];
 }
 
+function parseTransform(transform: any) {
+	const result = transform.match(/[\w.-]+/g);
+    return [+result[1], +result[2]];
+}
+
 export function getCollisions(
 	circles: Selection<BaseType | SVGCircleElement, Stop, SVGGElement, Train>
 ) {
@@ -95,7 +100,7 @@ export function getCollisions(
 
 	circles.each(function (d, i) {
 		const transform = select(this).attr('transform');
-		const [x, y] = getTransform(transform);
+		const [x, y] = parseTransform(transform);
 		if (transforms.hasOwnProperty(transform)) {
 			collision.push({ location: [x, y], data: d });
 		}
