@@ -1,6 +1,6 @@
 import { select } from 'd3';
 import { axisBottom, axisTop } from 'd3-axis';
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { convertDateToString } from '../utils';
 
 interface XAxisProps {

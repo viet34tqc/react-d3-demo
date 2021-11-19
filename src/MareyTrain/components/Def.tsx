@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { select } from 'd3';
 import { memo, useEffect, useRef } from 'react';
 import { height, innerWidth, margin } from '../utils';

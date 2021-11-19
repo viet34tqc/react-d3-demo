@@ -1,6 +1,6 @@
 import { tsv } from 'd3';
 import { useEffect, useState } from 'react';
-import TimeRangeSlider from './components/Slider';
+import TimeRangeSlider from './components/TimeRangeSlider';
 import MareyTrainChart from './MareyTrainChart';
 import { RawDataItem, Station, Train } from './types';
 import { convertMinutesToTimes, parseTime } from './utils';
