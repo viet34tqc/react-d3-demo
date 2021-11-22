@@ -116,6 +116,7 @@ const Trains = ({ xScale, yScale, trains }: TrainsProps) => {
 				.style('height', '10px')
 				.style('stroke-width', '1px')
 				.style('stroke', '#333')
+				.style('cursor', 'pointer')
 				.on('mouseover', function (event: MouseEvent) {
 					select('body')
 						.append('div')
@@ -132,6 +133,14 @@ const Trains = ({ xScale, yScale, trains }: TrainsProps) => {
 				})
 				.on('mouseout', function () {
 					selectAll('.tooltip').remove();
+				})
+				// Demo broadcastChanel
+				.on('click', () => {
+					window.open(
+						window.location.href,
+						'_blank',
+						'toolbar=0,location=0,menubar=0'
+					);
 				});
 		});
 	}, [trains, xScale, yScale]);

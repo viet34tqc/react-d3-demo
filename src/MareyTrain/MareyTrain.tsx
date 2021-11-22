@@ -5,10 +5,13 @@ import MareyTrainChart from './MareyTrainChart';
 import { RawDataItem, Station, Train } from './types';
 import { convertMinutesToTimes, parseTime } from './utils';
 
+const broadcastName = 'mareyTrain';
+
 const MareyTrain = () => {
 	const [stations, setStations] = useState<Station[]>([]);
 	const [minutes, setMinutes] = useState([270, 720]);
 	const [trains, setTrains] = useState<Train[]>([]);
+	const [broadcast, setBc] = useState<BroadcastChannel | null>(null);
 	const fetchData = async () => {
 		const originalItems = (await tsv(
 			'data/data.tsv'
@@ -56,10 +59,23 @@ const MareyTrain = () => {
 
 	useEffect(() => {
 		fetchData();
+		const broadcast = new BroadcastChannel(broadcastName);
+		setBc(broadcast);
+		return () => broadcast.close();
 	}, []);
+
+	useEffect(() => {
+		if (!broadcast) return;
+		broadcast.onmessage = (messageEvent: MessageEvent) => {
+			if (broadcast.name === broadcastName) {
+				setMinutes(messageEvent.data);
+			}
+		};
+	}, [broadcast]);
 
 	const handleChangeMinutes = (event: any, newValue: any) => {
 		setMinutes(newValue);
+		broadcast?.postMessage(newValue);
 	};
 
 	if (stations.length === 0) return <div>Loading...</div>;
