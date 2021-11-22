@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 import { csv, max, scaleBand, scaleLinear } from 'd3';
 import React, { useEffect, useState } from 'react';
 

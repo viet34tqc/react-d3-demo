@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import {
 	csv,
 	curveNatural,
@@ -185,6 +186,6 @@ const LineChart = () => {
 			</g>
 		</svg>
 	);
-};;
+};
 
 export default LineChart;

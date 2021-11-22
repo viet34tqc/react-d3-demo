@@ -32,7 +32,7 @@
 		"start": "react-scripts start",
 		"build": "react-scripts build",
 		"test": "react-scripts test -- --config jest.config.js",
-		"testc": "react-scripts test --coverage --watchAll=false -- --config jest.config.js ",
+		"testc": "react-scripts test --coverage --watchAll=false",
 		"eject": "react-scripts eject"
 	},
 	"eslintConfig": {
@@ -51,6 +51,15 @@
 			"last 1 chrome version",
 			"last 1 firefox version",
 			"last 1 safari version"
+		]
+	},
+	"jest": {
+		"transformIgnorePatterns": [
+			"node_modules/(?!(internmap|d3))"
+		],
+		"collectCoverageFrom": [
+			"src/**/*.{jsx,tsx}",
+			"!src/**/*.ts"
 		]
 	},
 	"devDependencies": {
