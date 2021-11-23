@@ -42,7 +42,7 @@ const MareyTrainChart = ({ trains, stations, times }: MareyTrainChartProps) => {
 	);
 
 	return (
-		<svg ref={svgRef} width={width} height={height}>
+		<svg ref={svgRef} width={width} height={height} data-testid="svgRef">
 			<g transform={`translate(${margin.left},${margin.top})`}>
 				<XAxis type="top" scale={xScale} />
 				<XAxis

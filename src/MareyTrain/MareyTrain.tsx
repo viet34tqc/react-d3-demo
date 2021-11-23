@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { tsv } from 'd3';
 import { useEffect, useState } from 'react';
 import TimeRangeSlider from './components/TimeRangeSlider';
