@@ -13,6 +13,21 @@ const MareyTrain = () => {
 	const [minutes, setMinutes] = useState([270, 720]);
 	const [trains, setTrains] = useState<Train[]>([]);
 	const [broadcast, setBc] = useState<BroadcastChannel | null>(null);
+
+	const fetchXML = async () => {
+		const url = 'https://my.api.mockaroo.com/users.json?key=65d65940';
+		const response = await fetch(url, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/xml',
+			},
+		});
+		const data = await response.text();
+		const XMLParser = require('react-xml-parser');
+		const xml = new XMLParser().parseFromString(data);
+		console.log('xml', xml.getElementsByTagName('first_name'));
+	};
+
 	const fetchData = async () => {
 		const originalItems = (await tsv(
 			'data/data.tsv'
@@ -59,6 +74,7 @@ const MareyTrain = () => {
 	};
 
 	useEffect(() => {
+		fetchXML();
 		fetchData();
 		const broadcast = new BroadcastChannel(broadcastName);
 		setBc(broadcast);
