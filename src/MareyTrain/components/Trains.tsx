@@ -25,7 +25,7 @@ const Trains = ({ xScale, yScale, trains }: TrainsProps) => {
 		// Here is the line charts
 		// Put it at the bottom so that it can be on top of other lines.
 		const trainsChart = lineGroup
-			.attr('stroke-width', 1.5)
+			.attr('stroke-width', 2)
 			.attr('clip-path', 'url(#clipPath)')
 			.selectAll('g')
 			.data(trains)
@@ -46,18 +46,19 @@ const Trains = ({ xScale, yScale, trains }: TrainsProps) => {
 			.attr('stroke-dasharray', (d: Train) => strokes[d.type])
 			.attr('d', (d: any) => lines(d.stops))
 			.on('mouseover', function (event: MouseEvent, train: Train) {
+				select(this).transition().attr('stroke-width', 4);
 				const title = getTrainTitle(train);
-
 				select('body')
 					.append('div')
 					.style('position', 'absolute')
 					.attr('class', 'tooltip')
 					.style('visibility', 'visible')
 					.html(title)
-					.style('top', `${event.clientY}px`)
-					.style('left', `${event.clientX}px`);
+					.style('top', `${event.clientY + 15}px`)
+					.style('left', `${event.clientX + 15}px`);
 			})
 			.on('mouseleave', function () {
+				select(this).transition().attr('stroke-width', 2);
 				selectAll('.tooltip').remove();
 			});
 
